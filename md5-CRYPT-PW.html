@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de CRYPT-PW • AltDB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/unix-crypt-td-js@1.1.4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .eye-btn {
+            transition: all 0.2s ease;
+        }
+        .result-box {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden">
+       
+        <!-- Header -->
+        <div class="bg-[#2c3e50] px-8 py-6 text-white">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl">🔑</div>
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-tight">Gerador de Senha CRYPT-PW</h1>
+                    <p class="text-[#a1b4c4] text-sm">Formato DES Crypt oficial do AltDB</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8">
+            <p class="text-gray-600 text-center mb-8 text-sm">
+                Bem-vindo ao Gerador de Password MD5 CRYPT-PW!<br>
+            </p>
+
+            <!-- Campo de senha -->
+            <div class="mb-8">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Senha</label>
+                <div class="relative">
+                    <input
+                        id="senha-input"
+                        type="password"
+                        class="w-full px-5 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:border-blue-500 transition-colors"
+                        placeholder="Digite sua senha aqui...">
+                   
+                    <button onclick="alternarVisibilidade()"
+                            id="btn-olho"
+                            class="eye-btn absolute right-5 top-1/2 -translate-y-1/2 text-2xl text-gray-400 hover:text-gray-600">
+                        👁
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botão Gerar -->
+            <button onclick="gerarCryptPW()"
+                    class="w-full bg-[#3498db] hover:bg-[#2980b9] transition-colors text-white font-semibold text-lg py-5 rounded-2xl flex items-center justify-center gap-3 shadow-md">
+                <span class="text-2xl">🔐</span>
+                GERAR CRYPT-PW
+            </button>
+
+            <!-- Resultado -->
+            <div id="area-resultado" class="mt-10 hidden">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Resultado (copie e cole diretamente no IRR)</label>
+                <div class="relative">
+                    <pre id="resultado-text"
+                         class="result-box bg-gray-900 text-emerald-400 p-5 rounded-2xl text-base leading-relaxed overflow-auto min-h-[68px] whitespace-pre-wrap"></pre>
+                   
+                    <button onclick="copiarResultado()"
+                            class="absolute top-4 right-4 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-xl flex items-center gap-2 transition-colors">
+                        📋 Copiar
+                    </button>
+                </div>
+               
+                <p id="mensagem-sucesso" class="text-emerald-600 text-sm mt-3 text-center hidden">
+                    ✅ Copiado com sucesso!
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer com suas assinaturas -->
+        <div class="bg-gray-100 px-8 py-6 text-xs text-gray-600 border-t">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <p class="font-semibold text-gray-800">Netflow Consulting LTDA</p>
+                    <p class="text-gray-500">Desenvolvido por João Gabriel Ramos Barbosa</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-x-6 gap-y-2 text-[13px]">
+                    <a href="https://www.linkedin.com/in/jo%C3%A3o-gabriel-ramos-barbosa-911a2325b/" 
+                       target="_blank"
+                       class="hover:text-blue-600 transition-colors flex items-center gap-1">
+                        🔗 LinkedIn
+                    </a>
+                    <a href="https://www.instagram.com/joao_gabriel.ramos?utm_source=qr&igsh=MXRvN21meHdlcmtieg==" 
+                       target="_blank"
+                       class="hover:text-pink-600 transition-colors flex items-center gap-1">
+                        📷 Instagram
+                    </a>
+                    <a href="https://wa.me/5521969114807" 
+                       target="_blank"
+                       class="hover:text-green-600 transition-colors flex items-center gap-1">
+                        💬 WhatsApp: (21) 96911-4807
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-300 text-[10px] text-gray-500 text-center">
+                Compatível com AltDB • é • Qualquer IRR que use CRYPT-PW<br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function gerarSalt() {
+            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
+            let salt = "";
+            for (let i = 0; i < 2; i++) {
+                salt += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return salt;
+        }
+
+        function alternarVisibilidade() {
+            const input = document.getElementById("senha-input");
+            const btn = document.getElementById("btn-olho");
+           
+            if (input.type === "password") {
+                input.type = "text";
+                btn.textContent = "🔒";
+            } else {
+                input.type = "password";
+                btn.textContent = "👁";
+            }
+        }
+
+        function gerarCryptPW() {
+            const senha = document.getElementById("senha-input").value.trim();
+           
+            if (!senha) {
+                alert("⚠️ Por favor, digite uma senha.");
+                return;
+            }
+            
+            if (typeof unixCryptTD !== "function") {
+                alert("❌ Biblioteca de criptografia não carregou. Verifique a conexão ou hospede o JS localmente.");
+                return;
+            }
+
+            try {
+                const salt = gerarSalt();
+                const hashCompleto = unixCryptTD(senha, salt);
+                const resultado = `auth: CRYPT-PW ${hashCompleto}`;
+
+                const area = document.getElementById("area-resultado");
+                const texto = document.getElementById("resultado-text");
+                texto.textContent = resultado;
+                area.classList.remove("hidden");
+               
+                document.getElementById("mensagem-sucesso").classList.add("hidden");
+            } catch (erro) {
+                console.error(erro);
+                alert("Erro ao gerar o hash. Tente novamente.");
+            }
+        }
+
+        function copiarResultado() {
+            const texto = document.getElementById("resultado-text").textContent;
+           
+            navigator.clipboard.writeText(texto).then(() => {
+                const msg = document.getElementById("mensagem-sucesso");
+                msg.classList.remove("hidden");
+                setTimeout(() => msg.classList.add("hidden"), 2500);
+            });
+        }
+
+        console.log("%c✅ Gerador CRYPT-PW AltDB carregado com sucesso!", "color: #3498db; font-weight: bold");
+    </script>
+</body>
+</html>
